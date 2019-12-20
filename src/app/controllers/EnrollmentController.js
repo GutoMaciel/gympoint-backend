@@ -83,7 +83,14 @@ class EnrollmentController {
     await Mail.sendMail({
       to: `${student.name} <${student.email}>`,
       subject: 'Wellcome to the team.',
-      text: 'Your enrollment was made. Wellcome',
+      template: 'enrollment',
+      context: {
+        student: student.name,
+        plan: plan.title,
+        start_date: enrollment.start_date,
+        end_date: enrollment.end_date,
+        price: enrollment.price,
+      },
     });
 
     return res.json(enrollment);
