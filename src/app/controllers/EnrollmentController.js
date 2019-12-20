@@ -5,6 +5,8 @@ import Enrollment from '../models/Enrollment';
 import Plan from '../models/Plan';
 import Student from '../models/Student';
 
+import Mail from '../../lib/mail';
+
 class EnrollmentController {
   async store(req, res) {
     const schema = Yup.object().shape({
@@ -76,6 +78,12 @@ class EnrollmentController {
       start_date,
       end_date,
       price,
+    });
+
+    await Mail.sendMail({
+      to: `${student.name} <${student.email}>`,
+      subject: 'Wellcome to the team.',
+      text: 'Your enrollment was made. Wellcome',
     });
 
     return res.json(enrollment);
@@ -159,7 +167,7 @@ class EnrollmentController {
 
     enrollment.canceled_at = new Date();
 
-    await enrollment.destroy();
+    await enrollment.save();
 
     return res.json();
   }
