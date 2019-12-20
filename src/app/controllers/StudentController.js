@@ -1,9 +1,10 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Student from '../models/Student';
 
 class StudentController {
   async store(req, res) {
-    const schema = Yup.objetct().shape({
+    const schema = Yup.object().shape({
       name: Yup.string().required(),
       email: Yup.string()
         .email()
@@ -78,6 +79,36 @@ class StudentController {
       weight,
       height,
     });
+  }
+
+  async index(req, res) {
+    const { name } = req.query;
+    const { page = 1 } = req.query;
+
+    if (name) {
+      const student = await Student.findAndCountAll({
+        where: {
+          name: { [Op.iLike]: `%${name}%` },
+        },
+        limit: 10,
+        order: ['id'],
+        offset: (page - 1) * 10,
+      });
+
+      if (!student) {
+        return res.status(400).json({ error: 'Student not found.' });
+      }
+
+      return res.json(student);
+    }
+
+    const students = await Student.findAndCountAll({
+      order: ['name'],
+      limit: 10,
+      offset: (page - 1) * 10,
+    });
+
+    return res.json(students);
   }
 }
 

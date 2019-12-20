@@ -5,7 +5,7 @@ class PlanController {
   async store(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string().required(),
-      diration: Yup.number().required(),
+      duration: Yup.number().required(),
       price: Yup.number().required(),
     });
 

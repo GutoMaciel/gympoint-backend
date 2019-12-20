@@ -74,6 +74,14 @@ class UserController {
       name,
     });
   }
+
+  async index(req, res) {
+    const user = await User.findAll({
+      order: ['id'],
+    });
+
+    return res.json(user);
+  }
 }
 
 export default new UserController();
