@@ -5,7 +5,9 @@ import Enrollment from '../models/Enrollment';
 import Plan from '../models/Plan';
 import Student from '../models/Student';
 
-import Mail from '../../lib/mail';
+// import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import EnrollmentMail from '../jobs/EnrollmentMail';
 
 class EnrollmentController {
   async store(req, res) {
@@ -80,17 +82,23 @@ class EnrollmentController {
       price,
     });
 
-    await Mail.sendMail({
-      to: `${student.name} <${student.email}>`,
-      subject: 'Wellcome to the team.',
-      template: 'enrollment',
-      context: {
-        student: student.name,
-        plan: plan.title,
-        start_date: enrollment.start_date,
-        end_date: enrollment.end_date,
-        price: enrollment.price,
-      },
+    // await Mail.sendMail({
+    //   to: `${student.name} <${student.email}>`,
+    //   subject: 'Wellcome to the team.',
+    //   template: 'enrollment',
+    //   context: {
+    //     student: student.name,
+    //     plan: plan.title,
+    //     start_date: enrollment.start_date,
+    //     end_date: enrollment.end_date,
+    //     price: enrollment.price,
+    //   },
+    // });
+
+    await Queue.add(EnrollmentMail.key, {
+      enrollment,
+      student,
+      plan,
     });
 
     return res.json(enrollment);
