@@ -90,7 +90,7 @@ class StudentController {
         where: {
           name: { [Op.iLike]: `%${name}%` },
         },
-        limit: 10,
+        limit: 15,
         order: ['id'],
         offset: (page - 1) * 10,
       });
@@ -104,11 +104,27 @@ class StudentController {
 
     const students = await Student.findAndCountAll({
       order: ['name'],
-      limit: 10,
+      limit: 15,
       offset: (page - 1) * 10,
     });
 
     return res.json(students);
+  }
+
+  async show(req, res) {
+    const studentDetail = await Student.findByPk(req.params.id, {
+      attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
+    });
+
+    return res.json(studentDetail);
+  }
+
+  async delete(req, res) {
+    const student = await Student.findByPk(req.params.id);
+
+    await student.destroy();
+
+    return res.json();
   }
 }
 

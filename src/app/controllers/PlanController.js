@@ -44,6 +44,14 @@ class PlanController {
     return res.json(plan);
   }
 
+  async show(req, res) {
+    const planDetail = await Plan.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'price', 'duration'],
+    });
+
+    return res.json(planDetail);
+  }
+
   async update(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string(),

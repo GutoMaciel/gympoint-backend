@@ -6,23 +6,59 @@ class HelpOrdersController {
   // list all questions without answers:
 
   async index(req, res) {
-    const { id } = req.params;
+    const { page = 1, perPage = 10 } = req.query;
 
-    const student = await Student.findByPk(id);
-    if (!student) {
-      return res.status(400).json({ error: 'Student not found.' });
-    }
-    const helpOrders = await HelpOrders.findAll({
+    const helpOrder = await HelpOrders.findAndCountAll({
       where: {
-        student_id: id,
+        answer_at: null,
       },
-      order: ['id'],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
+        },
+      ],
+      order: ['created_at'],
+      limite: perPage,
+      offset: (page - 1) * perPage,
     });
 
-    return res.json(helpOrders);
+    return res.json(helpOrder);
   }
 
+  //   const { id } = req.params;
+
+  //   const student = await Student.findByPk(id);
+  //   if (!student) {
+  //     return res.status(400).json({ error: 'Student not found.' });
+  //   }
+  //   const helpOrders = await HelpOrders.findAll({
+  //     where: {
+  //       student_id: id,
+  //     },
+  //     order: ['id'],
+  //   });
+
+  //   return res.json(helpOrders);
+  // }
+
   // subscript help orders by student:
+
+  async show(req, res) {
+    const question = await HelpOrders.findByPk(req.params.id, {
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
+        },
+      ],
+      attributes: ['id', 'question', 'answer', 'created_at', 'answer_at'],
+    });
+
+    return res.json(question);
+  }
 
   async store(req, res) {
     const schema = Yup.object().shape({

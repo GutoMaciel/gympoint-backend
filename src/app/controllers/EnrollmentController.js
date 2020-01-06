@@ -109,10 +109,22 @@ class EnrollmentController {
       where: { canceled_at: null },
       order: ['id'],
       limit: 10,
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name', 'id'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['title', 'id', 'price', 'duration'],
+        },
+      ],
       attributes: [
         'id',
-        'student_id',
-        'plan_id',
+        // 'student_id',
+        // 'plan_id',
         'start_date',
         'end_date',
         'price',
@@ -121,6 +133,34 @@ class EnrollmentController {
     });
 
     return res.json(enrollment);
+  }
+
+  async show(req, res) {
+    const enrollmentDetail = await Enrollment.findByPk(req.params.id, {
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name', 'id'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['title', 'id', 'price', 'duration'],
+        },
+      ],
+      attributes: [
+        'id',
+        // 'student_id',
+        // 'plan_id',
+        'start_date',
+        'end_date',
+        'price',
+        'active',
+      ],
+    });
+
+    return res.json(enrollmentDetail);
   }
 
   async update(req, res) {
@@ -182,7 +222,7 @@ class EnrollmentController {
 
     enrollment.canceled_at = new Date();
 
-    await enrollment.save();
+    await enrollment.destroy();
 
     return res.json();
   }
