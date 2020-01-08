@@ -105,10 +105,12 @@ class EnrollmentController {
   }
 
   async index(req, res) {
+    const { page = 1 } = req.query;
     const enrollment = await Enrollment.findAll({
       where: { canceled_at: null },
       order: ['id'],
       limit: 10,
+      offset: (page - 1) * 10,
       include: [
         {
           model: Student,
