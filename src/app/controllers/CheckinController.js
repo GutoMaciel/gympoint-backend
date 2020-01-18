@@ -11,8 +11,8 @@ class CheckinController {
       where: {
         student_id: id,
       },
-      order: ['id'],
-      limit: 10,
+      order: [['created_at', 'desc']],
+      limit: 15,
     });
 
     return res.json(checkin);

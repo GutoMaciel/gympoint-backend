@@ -46,7 +46,17 @@ class HelpOrdersController {
   // subscript help orders by student:
 
   async show(req, res) {
-    const question = await HelpOrders.findByPk(req.params.id, {
+    const { id } = req.params;
+
+    const questions = await HelpOrders.findAll({
+      where: {
+        student_id: id,
+      },
+      order: [
+        ['answer_at', 'desc'],
+        ['created_at', 'desc'],
+      ],
+      limit: 10,
       include: [
         {
           model: Student,
@@ -54,10 +64,22 @@ class HelpOrdersController {
           attributes: ['id', 'name'],
         },
       ],
-      attributes: ['id', 'question', 'answer', 'created_at', 'answer_at'],
     });
 
-    return res.json(question);
+    return res.json(questions);
+
+    // const question = await HelpOrders.findByPk(req.params.id, {
+    //   include: [
+    //     {
+    //       model: Student,
+    //       as: 'student',
+    //       attributes: ['id', 'name'],
+    //     },
+    //   ],
+    //   attributes: ['id', 'question', 'answer', 'created_at', 'answer_at'],
+    // });
+
+    // return res.json(question);
   }
 
   async store(req, res) {
